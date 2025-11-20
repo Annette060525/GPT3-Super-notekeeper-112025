@@ -1,0 +1,72 @@
+```yaml
+# agents.yaml
+# Values in ${...} are injected from Streamlit using string.Template
+# (see load_agents_config in app.py).
+
+metadata:
+  name: "Flower Agents Workspace"
+  description: "Multi-provider, multi-model agent orchestration"
+  version: "1.0"
+
+defaults:
+  model:
+    provider: "${PROVIDER}"        # e.g. Gemini / OpenAI / Anthropic
+    name: "${MODEL_NAME}"          # e.g. gemini-2.5-flash
+    temperature: ${TEMPERATURE}    # e.g. 0.7
+    max_tokens: ${MAX_TOKENS}      # e.g. 2048
+
+agents:
+  - id: "researcher"
+    role: "Research & Analysis Agent"
+    goal: "Perform deep research and provide well-structured reports with citations."
+    backstory: >
+      You are a meticulous research assistant. You always double-check facts,
+      cite your sources, and provide concise but complete answers.
+    model:
+      # override only if you want something different from defaults.model
+      provider: "${PROVIDER}"
+      name: "${MODEL_NAME}"
+    tools:
+      - "web_search"
+      - "web_page_reader"
+
+  - id: "summarizer"
+    role: "Summarization Agent"
+    goal: "Turn long content (documents, chats, notes) into concise summaries."
+    backstory: >
+      You specialize in summarizing long and complex texts into short, clear,
+      and accurate synopses, preserving key details.
+    model:
+      provider: "${PROVIDER}"
+      name: "${MODEL_NAME}"
+    tools:
+      - "text_summarizer"
+
+workflows:
+  - id: "research_and_summary"
+    description: "Use researcher to gather information then summarizer to condense it."
+    entry_agent: "researcher"
+    steps:
+      - agent: "researcher"
+        input: "User query and context"
+        output_key: "research_report"
+      - agent: "summarizer"
+        input: "Use {{ research_report }} as the source to summarize."
+
+tools:
+  - id: "web_search"
+    type: "http"
+    description: "Search the web for recent information."
+    config:
+      # Fill with your actual implementation or tool config
+      base_url: "https://api.example.com/search"
+  - id: "web_page_reader"
+    type: "http"
+    description: "Fetch and extract main content from a web page."
+    config:
+      base_url: "https://api.example.com/read"
+  - id: "text_summarizer"
+    type: "builtin"
+    description: "Simple summarization logic or external summarization tool."
+    config: {}
+```
