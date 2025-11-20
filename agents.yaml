@@ -1,4 +1,3 @@
-```yaml
 # agents.yaml
 # Values in ${...} are injected from Streamlit using string.Template
 # (see load_agents_config in app.py).
@@ -69,4 +68,3 @@ tools:
     type: "builtin"
     description: "Simple summarization logic or external summarization tool."
     config: {}
-```
